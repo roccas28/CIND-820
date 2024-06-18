@@ -43,6 +43,16 @@ brfss_2021_dataset.head()
 # _CURECI1 = Question: Adults who are current e-cigarette users
 # DRNKANY5 = Question: Adults who reported having had at least one drink of alcohol in the past 30 days.
 # 'HTM4', 'WTKG3',                                          '_BMI5', 
+# MSCODE = Metropolitan Status Code
+# _FLSHOT7 = Adults aged 65+ who have had a flu shot within the past year
+# EMPLOY1 = Are you currently…?
+# MARITAL = Are you: (marital status)
+# PRIMINSR = What is the current primary source of your health insurance?
+# CHCKDNY2 = Not including kidney stones, bladder infection or incontinence, were you ever told you had kidney disease?
+# ADDEPEV3 = (Ever told) (you had) a depressive disorder (including depression, major depression, dysthymia, or minor depression)?
+# RENTHOM1 = Do you own or rent your home?
+# BLIND = Are you blind or do you have serious difficulty seeing, even when wearing glasses?
+# DECIDE = Because of a physical, mental, or emotional condition, do you have serious difficulty concentrating, remembering, or making decisions?
 
 brfss_df_selected = brfss_2021_dataset[['DIABETE4',
                                          '_RFHYPE6',  
@@ -56,7 +66,9 @@ brfss_df_selected = brfss_2021_dataset[['DIABETE4',
                                          'GENHLTH', 'MENTHLTH', 'PHYSHLTH', 'DIFFWALK', 
                                          '_SEX', '_AGEG5YR', 'EDUCA', 'INCOME3', 
                                          '_RACEPRV', '_BMI5CAT', '_RFSMOK3',
-                                         '_CURECI1', 'DRNKANY5' ]]
+                                         '_CURECI1', 'DRNKANY5', 
+                                         'MSCODE', '_FLSHOT7', 'EMPLOY1', 'MARITAL', 'PRIMINSR', 'CHCKDNY2',
+                                         'ADDEPEV3', 'RENTHOM1', 'BLIND', 'DECIDE']]
 
 #brfss_df_selected.shape
 
@@ -70,11 +82,10 @@ brfss_df_selected = brfss_df_selected.dropna()
 # (438700, 29)
 
 # DIABETE4
-# 2 = Yes
-# 1 = pre-diabetes or borderline diabetes
-# 0 = No diabetes or only during pregnancy, 
+# 1 = Yes
+# 0 = No diabetes or only during pregnancy AND pre-diabetes or borderline diabetes 
 # Remove 7 + 9 (Missing)
-brfss_df_selected['DIABETE4'] = brfss_df_selected['DIABETE4'].replace({1:2, 2:0, 3:0, 4:1})
+brfss_df_selected['DIABETE4'] = brfss_df_selected['DIABETE4'].replace({1:1, 2:0, 3:0, 4:0})
 brfss_df_selected = brfss_df_selected[brfss_df_selected.DIABETE4 != 7]
 brfss_df_selected = brfss_df_selected[brfss_df_selected.DIABETE4 != 9]
 
@@ -202,9 +213,14 @@ brfss_df_selected = brfss_df_selected[brfss_df_selected.DIFFWALK != 9]
 brfss_df_selected['_SEX'] = brfss_df_selected['_SEX'].replace({2:0})
 
 # _AGEG5YR
-# 1 = 18-24 -> 13 = 80 and older
-# 5 year increments.
+# 1 = 30 - 39 -> 6 = 80 and older
+# Combined pairs into 1 group to mimic study
+# 9 year increments.
+# Removed 1 + 2 since below 30
 # Remove 14 (Missing)
+brfss_df_selected['_AGEG5YR'] = brfss_df_selected['_AGEG5YR'].replace({3:1, 4:1, 5:2, 6:2, 7:3, 8:3, 9:4, 10:4, 11:5, 12:5, 13:6})
+brfss_df_selected = brfss_df_selected[brfss_df_selected._AGEG5YR != 1]
+brfss_df_selected = brfss_df_selected[brfss_df_selected._AGEG5YR != 2]
 brfss_df_selected = brfss_df_selected[brfss_df_selected._AGEG5YR != 14]
 
 # EDUCA
@@ -263,6 +279,73 @@ brfss_df_selected['DRNKANY5'] = brfss_df_selected['DRNKANY5'].replace({2:0})
 brfss_df_selected = brfss_df_selected[brfss_df_selected.DRNKANY5 != 7]
 brfss_df_selected = brfss_df_selected[brfss_df_selected.DRNKANY5 != 9]
 
+# MSCODE
+# 1-5 Metropolitian status, no changes needed
+
+# _FLSHOT7
+# 1 = Yes
+# 2 = 0 = No
+# Remove 9 (Missing)
+brfss_df_selected['_FLSHOT7'] = brfss_df_selected['_FLSHOT7'].replace({2:0})
+brfss_df_selected = brfss_df_selected[brfss_df_selected._FLSHOT7 != 7]
+
+# EMPLOY1
+# 1-8 various options
+# Remove 9 (Missing)
+brfss_df_selected = brfss_df_selected[brfss_df_selected.EMPLOY1 != 9]
+
+# MARITAL
+# 1-6 various options
+# Remove 9 (Missing)
+brfss_df_selected = brfss_df_selected[brfss_df_selected.MARITAL != 9]
+
+# PRIMINSR
+# 1-10 + 88, various options
+# Remove 77 and 99 (Missing)
+brfss_df_selected = brfss_df_selected[brfss_df_selected.PRIMINSR != 77]
+brfss_df_selected = brfss_df_selected[brfss_df_selected.PRIMINSR != 99]
+
+# CHCKDNY2
+# 1 = Yes
+# 2 = 0 = No
+# Remove 7 + 9 (Missing)
+brfss_df_selected['CHCKDNY2'] = brfss_df_selected['CHCKDNY2'].replace({2:0})
+brfss_df_selected = brfss_df_selected[brfss_df_selected.CHCKDNY2 != 7]
+brfss_df_selected = brfss_df_selected[brfss_df_selected.CHCKDNY2 != 9]
+
+# ADDEPEV3
+# 1 = Yes
+# 2 = 0 = No
+# Remove 7 + 9 (Missing)
+brfss_df_selected['ADDEPEV3'] = brfss_df_selected['ADDEPEV3'].replace({2:0})
+brfss_df_selected = brfss_df_selected[brfss_df_selected.ADDEPEV3 != 7]
+brfss_df_selected = brfss_df_selected[brfss_df_selected.ADDEPEV3 != 9]
+
+# RENTHOM1
+# 1 = Own
+# 2 = 0 = Rent
+# 3 = Other
+# Remove 7 + 9 (Missing)
+brfss_df_selected['RENTHOM1'] = brfss_df_selected['RENTHOM1'].replace({2:0})
+brfss_df_selected = brfss_df_selected[brfss_df_selected.RENTHOM1 != 7]
+brfss_df_selected = brfss_df_selected[brfss_df_selected.RENTHOM1 != 9]
+
+# BLIND
+# 1 = Yes
+# 2 = 0 = No
+# Remove 7 + 9 (Missing)
+brfss_df_selected['BLIND'] = brfss_df_selected['BLIND'].replace({2:0})
+brfss_df_selected = brfss_df_selected[brfss_df_selected.BLIND != 7]
+brfss_df_selected = brfss_df_selected[brfss_df_selected.BLIND != 9]
+
+# DECIDE
+# 1 = Yes
+# 2 = 0 = No
+# Remove 7 + 9 (Missing)
+brfss_df_selected['DECIDE'] = brfss_df_selected['DECIDE'].replace({2:0})
+brfss_df_selected = brfss_df_selected[brfss_df_selected.DECIDE != 7]
+brfss_df_selected = brfss_df_selected[brfss_df_selected.DECIDE != 9]
+
 #brfss_df_selected.shape
 
 #brfss_df_selected.groupby(['DIABETE4']).size()
@@ -281,9 +364,11 @@ brfss = brfss_df_selected.rename(columns = {'DIABETE4':'Diabetes',
                                          'GENHLTH':'GenHlth', 'MENTHLTH':'MentHlth', 'PHYSHLTH':'PhysHlth', 'DIFFWALK':'DiffWalk', 
                                          '_SEX':'Sex', '_AGEG5YR':'Age', 'EDUCA':'Education', 'INCOME3':'Income',
                                          '_RACEPRV' : 'Race', '_BMI5CAT' : 'BMICat', '_RFSMOK3': 'CurrSmoke',
-                                         '_CURECI1': 'CurrESmoke', 'DRNKANY5': 'Alcohol30' })
+                                         '_CURECI1': 'CurrESmoke', 'DRNKANY5': 'Alcohol30', 'MSCODE' : 'Residence', 
+                                         '_FLSHOT7' : 'FLUSHOT', 'EMPLOY1': 'EMPLOYED', 'MARITAL' : 'MARITAL', 'PRIMINSR': 'HLTINSURE', 'CHCKDNY2': 'KIDNEYDIS',
+                                         'ADDEPEV3': 'DEPRESSDIS', 'RENTHOM1': 'RENT', 'BLIND': 'BLIND', 'DECIDE': 'DECISION'})
 
 #Drop missing values - again
 brfss_df_selected = brfss_df_selected.dropna()
 
-brfss.to_csv(r"C:\Users\Roccas\Documents\TMU Data\CIND820 Big Data Analytics Project\LLCP2021XPT\diabetes_health_indicators_BRFSS2021.csv")
+brfss.to_csv(r"C:\Users\Roccas\Documents\TMU Data\CIND820 Big Data Analytics Project\LLCP2021XPT\diabetes_health_indicators_BRFSS2021_v20.csv")
