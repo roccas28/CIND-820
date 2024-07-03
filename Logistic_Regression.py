@@ -14,12 +14,14 @@ from sklearn.neighbors import KNeighborsClassifier
 df = pd.read_csv(r"C:\Users\Roccas\Documents\TMU Data\CIND820 Big Data Analytics Project\LLCP2021XPT\diabetes_health_indicators_BRFSS2021_v21.csv")
 
 # Diabetes is the dependent value
-y = df.iloc[:,0]
-x = df
-
+#y = df.iloc[:,0]
+#x = df
+X = list(set(list(df)) - set(['Diabetes']))
 
 # From the study being replicated, Training was 2/3 and Test was remaining 1/3
-xtrain, xtest, ytrain, ytest = train_test_split(x, y, test_size=0.33333333, random_state=0)
+#xtrain, xtest, ytrain, ytest = train_test_split(x, y, test_size=0.33333333, random_state=0)
+
+xtrain, xtest, ytrain, ytest = train_test_split(df[X], df['Diabetes'], test_size=0.35, random_state=42)
 
 #Logistic Regression
 SC = StandardScaler()
@@ -46,7 +48,9 @@ print(y_pred_KNN)
 
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-  
+
+# Logistic Regression
+
 CM_LR = confusion_matrix(ytest, y_pred_LR)
 
 disp = ConfusionMatrixDisplay(confusion_matrix=CM_LR)
