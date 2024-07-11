@@ -6,7 +6,21 @@ Cleaning.py = Cleaning of dataset -> Comments inside
 
 Data_Profiling.py = SweetViz + YData Profiling. -> Comments inside
 
-Logistic_Regression.py = Logistic Regression w/ Training/Test split along with other methods. -> Comments inside.
+Logistic_Regression.py = Logistic Regression w/  SMOTE + Training/Test split along w/ classifier performance > Comments inside.
+
+Logistic_Regression.ipynb = Results inside
+
+Decision Tree.py  =  Decision Tree w/  SMOTE + Training/Test split along w/ classifier performance > Comments inside.
+
+Decision Tree.ipynb = Results inside
+
+Gaussian Naive Bayes.py =  Gaussian Naive Bayes w/  SMOTE + Training/Test split along w/ classifier performance > Comments inside.
+
+Gaussian Naive Bayes.ipynb = Results inside
+
+KNN.py =  KNN w/  SMOTE + Training/Test split along w/ classifier performance > Comments inside.
+
+KNN.ipynb = Results inside
 
 Research Folder -> Papers referenced. 19_0109.pdf -> Main paper referenced
 
