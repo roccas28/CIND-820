@@ -75,34 +75,27 @@ y_train_sampled_df = pd.DataFrame(y_train_sampled)
 X_test_sampled_df = pd.DataFrame(X_test_sampled)
 y_test_sampled_df = pd.DataFrame(y_test_sampled)
 
-
-#y = df.iloc[:,0]
-#x = df
-#X = list(set(list(df)) - set(['Diabetes']))
-
-# From the study being replicated, Training was 2/3 and Test was remaining 1/3
-#xtrain, xtest, ytrain, ytest = train_test_split(x, y, test_size=0.33333333, random_state=0)
-
-#xtrain, xtest, ytrain, ytest = train_test_split(df[X], df['Diabetes'], test_size=0.35, random_state=42)
-
-# Logistic Regression
+# KNN
 SC = StandardScaler()
 xtrain = SC.fit_transform(X_train_sampled)
 xtest = SC.transform(X_test_sampled)
-  
-LR = LogisticRegression()
-LR.fit(xtrain, y_train_sampled)
-y_pred_LR = LR.predict(xtest)
-print(y_pred_LR)
 
-# Confusion Matrix - Logistic Regression
-CM_LR = confusion_matrix(y_test_sampled, y_pred_LR)
+KNN = KNeighborsClassifier(n_neighbors=7) 
+KNN.fit(xtrain, y_train_sampled)
+y_pred_KNN = KNN.predict(xtest)
+print(y_pred_KNN)
+
+# Confusion Matrix - KNN
+CM_LR = confusion_matrix(y_test_sampled, y_pred_KNN)
 disp = ConfusionMatrixDisplay(confusion_matrix=CM_LR)
+disp.plot()
+CM_KNN = confusion_matrix(y_test_sampled, y_pred_KNN)
+disp = ConfusionMatrixDisplay(confusion_matrix=CM_KNN)
 disp.plot()
 
 #Calculating Classifier performances
-precision, recall, fscore, support = precision_recall_fscore_support(y_test_sampled, y_pred_LR)
-accuracy = accuracy_score(y_test_sampled, y_pred_LR)
+precision, recall, fscore, support = precision_recall_fscore_support(y_test_sampled, y_pred_KNN)
+accuracy = accuracy_score(y_test_sampled, y_pred_KNN)
 
 # Code to print out results
 print('precision: {}'.format(precision))
@@ -112,14 +105,12 @@ print('support: {}'.format(support))
 print('accuracy: {}'.format(accuracy))
 
 # Classification report with tabled results + AUC score
-print(classification_report(y_test_sampled, y_pred_LR))
-#print(roc_auc_score(y_pred_LR, LR.predict_proba(xtest)))
-print(roc_auc_score(y_test_sampled, y_pred_LR))
+print(classification_report(y_test_sampled, y_pred_KNN))
+print(roc_auc_score(y_test_sampled, y_pred_KNN))
 
 # Manually calculating specificity + sensitivity
-tn, fp, fn, tp = confusion_matrix(y_test_sampled, y_pred_LR).ravel()
+tn, fp, fn, tp = confusion_matrix(y_test_sampled, y_pred_KNN).ravel()
 specificity = tn / (tn+fp)
 sensitivity = tp / (tp+fn)
 print('specificity: {}'.format(specificity))
 print('sensitivity: {}'.format(sensitivity))
-

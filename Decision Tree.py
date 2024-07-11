@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix,precision_recall_curve,auc,roc_auc_score,roc_curve,recall_score,classification_report
 from sklearn.metrics import precision_recall_fscore_support,ConfusionMatrixDisplay,accuracy_score
+from sklearn import tree
 
 # Loading dataset
 df = pd.read_csv(r"C:\Users\Roccas\Documents\TMU Data\CIND820 Big Data Analytics Project\LLCP2021XPT\diabetes_health_indicators_BRFSS2021_v21.csv")
@@ -75,34 +76,24 @@ y_train_sampled_df = pd.DataFrame(y_train_sampled)
 X_test_sampled_df = pd.DataFrame(X_test_sampled)
 y_test_sampled_df = pd.DataFrame(y_test_sampled)
 
-
-#y = df.iloc[:,0]
-#x = df
-#X = list(set(list(df)) - set(['Diabetes']))
-
-# From the study being replicated, Training was 2/3 and Test was remaining 1/3
-#xtrain, xtest, ytrain, ytest = train_test_split(x, y, test_size=0.33333333, random_state=0)
-
-#xtrain, xtest, ytrain, ytest = train_test_split(df[X], df['Diabetes'], test_size=0.35, random_state=42)
-
-# Logistic Regression
+# Gaussian Naive Bayes
 SC = StandardScaler()
 xtrain = SC.fit_transform(X_train_sampled)
 xtest = SC.transform(X_test_sampled)
-  
-LR = LogisticRegression()
-LR.fit(xtrain, y_train_sampled)
-y_pred_LR = LR.predict(xtest)
-print(y_pred_LR)
 
-# Confusion Matrix - Logistic Regression
-CM_LR = confusion_matrix(y_test_sampled, y_pred_LR)
+DT = tree.DecisionTreeClassifier()
+y_pred = DT.fit(xtrain, y_train_sampled).predict(xtest)
+y_pred_DT = DT.predict(xtest)
+print(y_pred_DT)
+
+# Confusion Matrix - Gaussian Naive Bayes
+CM_LR = confusion_matrix(y_test_sampled, y_pred_DT)
 disp = ConfusionMatrixDisplay(confusion_matrix=CM_LR)
 disp.plot()
 
 #Calculating Classifier performances
-precision, recall, fscore, support = precision_recall_fscore_support(y_test_sampled, y_pred_LR)
-accuracy = accuracy_score(y_test_sampled, y_pred_LR)
+precision, recall, fscore, support = precision_recall_fscore_support(y_test_sampled, y_pred_DT)
+accuracy = accuracy_score(y_test_sampled, y_pred_DT)
 
 # Code to print out results
 print('precision: {}'.format(precision))
@@ -112,12 +103,11 @@ print('support: {}'.format(support))
 print('accuracy: {}'.format(accuracy))
 
 # Classification report with tabled results + AUC score
-print(classification_report(y_test_sampled, y_pred_LR))
-#print(roc_auc_score(y_pred_LR, LR.predict_proba(xtest)))
-print(roc_auc_score(y_test_sampled, y_pred_LR))
+print(classification_report(y_test_sampled, y_pred_DT))
+print(roc_auc_score(y_test_sampled, y_pred_DT))
 
 # Manually calculating specificity + sensitivity
-tn, fp, fn, tp = confusion_matrix(y_test_sampled, y_pred_LR).ravel()
+tn, fp, fn, tp = confusion_matrix(y_test_sampled, y_pred_DT).ravel()
 specificity = tn / (tn+fp)
 sensitivity = tp / (tp+fn)
 print('specificity: {}'.format(specificity))
