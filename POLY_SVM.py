@@ -14,6 +14,12 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix,precision_recall_curve,auc,roc_auc_score,roc_curve,recall_score,classification_report
 from sklearn.metrics import precision_recall_fscore_support,ConfusionMatrixDisplay,accuracy_score
+from sklearn import tree
+from sklearn.neural_network import MLPClassifier
+from sklearn import svm
+from sklearn.svm import LinearSVC
+from sklearn.pipeline import make_pipeline
+from sklearn.svm import SVC
 
 # Loading dataset
 df = pd.read_csv(r"C:\Users\Roccas\Documents\TMU Data\CIND820 Big Data Analytics Project\LLCP2021XPT\diabetes_health_indicators_BRFSS2021_v21.csv")
@@ -37,25 +43,25 @@ y.value_counts()
 # Confirm values are similar now
 print(np.count_nonzero(y_train_sampled == 0))
 print(np.count_nonzero(y_train_sampled == 1))
-
-# Logistic Regression
+ 
+# Support Vector Machine - Poly
 SC = StandardScaler()
 xtrain = SC.fit_transform(X_train_sampled)
 xtest = SC.transform(X_test)
-  
-LR = LogisticRegression()
-LR.fit(xtrain, y_train_sampled)
-y_pred_LR = LR.predict(xtest)
-print(y_pred_LR)
+
+SVM = SVC(kernel='poly')
+SVM = SVM.fit(xtrain, y_train_sampled)
+y_pred_SVM = SVM.predict(xtest)
+print(y_pred_SVM)
 
 # Confusion Matrix 
-CM_LR = confusion_matrix(y_test, y_pred_LR)
-disp = ConfusionMatrixDisplay(confusion_matrix=CM_LR)
+CM_SVM = confusion_matrix(y_test, y_pred_SVM)
+disp = ConfusionMatrixDisplay(confusion_matrix=CM_SVM)
 disp.plot()
 
-# Calculating Classifier performances
-precision, recall, fscore, support = precision_recall_fscore_support(y_test, y_pred_LR)
-accuracy = accuracy_score(y_test, y_pred_LR)
+#Calculating Classifier performances
+precision, recall, fscore, support = precision_recall_fscore_support(y_test, y_pred_SVM)
+accuracy = accuracy_score(y_test, y_pred_SVM)
 
 # Code to print out results
 print('precision: {}'.format(precision))
@@ -65,11 +71,11 @@ print('support: {}'.format(support))
 print('accuracy: {}'.format(accuracy))
 
 # Classification report with tabled results + AUC score
-print(classification_report(y_test, y_pred_LR))
-print(roc_auc_score(y_test, y_pred_LR))
+print(classification_report(y_test, y_pred_SVM))
+print(roc_auc_score(y_test, y_pred_SVM))
 
 # Manually calculating specificity + sensitivity
-tn, fp, fn, tp = confusion_matrix(y_test, y_pred_LR).ravel()
+tn, fp, fn, tp = confusion_matrix(y_test, y_pred_SVM).ravel()
 specificity = tn / (tn+fp)
 sensitivity = tp / (tp+fn)
 print('specificity: {}'.format(specificity))
