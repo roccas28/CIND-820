@@ -14,6 +14,14 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix,precision_recall_curve,auc,roc_auc_score,roc_curve,recall_score,classification_report
 from sklearn.metrics import precision_recall_fscore_support,ConfusionMatrixDisplay,accuracy_score
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.feature_selection import SelectKBest,chi2
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.metrics import r2_score
+
+#r2 = r2_score(y_test, y_pred_KNN)
+#print('R2: {}'.format(r2))
 
 # Loading dataset
 df = pd.read_csv(r"C:\Users\Roccas\Documents\TMU Data\CIND820 Big Data Analytics Project\LLCP2021XPT\diabetes_health_indicators_BRFSS2021_v21.csv")
@@ -30,7 +38,7 @@ print("Number diabetes test dataset: ", len(X_test))
 print("Total number of diabetes: ", len(X_train)+len(X_test))
 
 # Apply SMOTE to create observations for Diabetes
-sm = SMOTE(sampling_strategy='minority')
+sm = SMOTE(sampling_strategy='minority', random_state = 0)
 X_train_sampled,y_train_sampled = sm.fit_resample(X_train,y_train.values.ravel())
 y.value_counts()
 
@@ -43,20 +51,16 @@ SC = StandardScaler()
 xtrain = SC.fit_transform(X_train_sampled)
 xtest = SC.transform(X_test)
 
-# Explaination - incoming - Test for now.
-KNN = KNeighborsClassifier(n_neighbors=7) 
+# More neighbors = Higher F score. Hardware limitations prevent increaing. 
+KNN = KNeighborsClassifier(n_neighbors=10000) 
 KNN.fit(xtrain, y_train_sampled)
 y_pred_KNN = KNN.predict(xtest)
 print(y_pred_KNN)
 
-# Confusion Matrix 
-CM_KNN = confusion_matrix(y_test, y_pred_KNN)
-disp = ConfusionMatrixDisplay(confusion_matrix=CM_KNN)
-disp.plot()
-
 # Calculating Classifier performances
 precision, recall, fscore, support = precision_recall_fscore_support(y_test, y_pred_KNN)
 accuracy = accuracy_score(y_test, y_pred_KNN)
+r2 = r2_score(y_test, y_pred_KNN)
 
 # Code to print out results
 print('precision: {}'.format(precision))
@@ -64,10 +68,11 @@ print('recall: {}'.format(recall))
 print('fscore: {}'.format(fscore))
 print('support: {}'.format(support))
 print('accuracy: {}'.format(accuracy))
+print('R2: {}'.format(r2))
 
 # Classification report with tabled results + AUC score
 print(classification_report(y_test, y_pred_KNN))
-print(roc_auc_score(y_test, y_pred_KNN))
+print('AUC Score: {}'.format(roc_auc_score(y_test, y_pred_KNN)))
 
 # Manually calculating specificity + sensitivity
 tn, fp, fn, tp = confusion_matrix(y_test, y_pred_KNN).ravel()
@@ -75,3 +80,12 @@ specificity = tn / (tn+fp)
 sensitivity = tp / (tp+fn)
 print('specificity: {}'.format(specificity))
 print('sensitivity: {}'.format(sensitivity))
+
+# Classification report Visualization
+clf_report = classification_report(y_test, y_pred_KNN, output_dict=True)
+sns.heatmap(pd.DataFrame(clf_report).iloc[:-1, :].T, annot=True)
+
+# Confusion Matrix 
+CM_KNN = confusion_matrix(y_test, y_pred_KNN)
+disp = ConfusionMatrixDisplay(confusion_matrix=CM_KNN)
+disp.plot()
